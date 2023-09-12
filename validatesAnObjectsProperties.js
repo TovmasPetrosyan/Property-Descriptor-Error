@@ -1,10 +1,23 @@
 function validateObject(obj, schema) {
-for (let prop of ob ){
-    if(prop in schema){
-
-    }
+    for (const prop in schema) {
+        const propertySchema = schema[prop];
+        const value = obj[prop];
+        
+        if (propertySchema.required && value === undefined) {
+            throw new Error(`The property "${prop}" is required.`);
+          }
+          if (propertySchema.validate) {
+            if (!propertySchema.validate(value)) {
+              throw new Error(`The property "${prop}" must be of type "${typeof propertySchema.value}".`);
+            }
+          }
+          Object.defineProperty(obj, prop, {
+            value: value,
+            writable: propertySchema.writable,
+            configurable: true,
+          });
 }
-
+return "Object is valid"
 
 }
 
@@ -22,3 +35,11 @@ const schema = {
     validate: (value) => typeof value === "number" && value >= 18,
     },
     };
+
+    const obj = {
+        "name": "Tovmas",
+        "age": 60
+      };
+      const validationResult = validateObject(obj, schema);
+    //  console.log(validationResult);
+     
